@@ -115,7 +115,7 @@ class PluginProperties implements \ArrayAccess
      *
      * @throws \BadMethodCallException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new \BadMethodCallException(
             __METHOD__ . ' is not allowed. ' . __CLASS__ . ' is read only.'
@@ -129,7 +129,7 @@ class PluginProperties implements \ArrayAccess
      *
      * @throws \BadMethodCallException
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new \BadMethodCallException(
             __METHOD__ . ' is not allowed. ' . __CLASS__ . ' is read only.'
