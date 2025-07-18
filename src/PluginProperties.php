@@ -99,7 +99,7 @@ class PluginProperties implements \ArrayAccess
      * @return mixed
      * @throws \OutOfRangeException If there is no property with the given name.
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if (!$this->offsetExists($offset)) {
             throw new \OutOfRangeException("'{$offset}' is not a valid plugin property.");
