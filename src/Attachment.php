@@ -247,7 +247,7 @@ class Attachment
                 $imageMeta = wp_get_attachment_metadata($attachmentId);
                 $content = str_replace(
                     $image,
-                    wp_image_add_srcset_and_sizes($image, $imageMeta, $attachmentId),
+                    $this->addSrcsetAndSizes($image, $imageMeta, $attachmentId),
                     $content
                 );
                 continue;
@@ -257,10 +257,34 @@ class Attachment
 
             $this->siteSwitcher->switchToBlog($this->site->id());
             $imageMeta = wp_get_attachment_metadata($globalAttachmentId);
-            $content = str_replace($image, wp_image_add_srcset_and_sizes($image, $imageMeta, $attachmentId), $content);
+            $content = str_replace($image, $this->addSrcsetAndSizes($image, $imageMeta, $attachmentId), $content);
             $this->siteSwitcher->restoreBlog();
         }
 
         return $content;
+    }
+
+    /**
+     * Add srcset and sizes to an image tag, unless its metadata cannot carry them.
+     *
+     * WordPress stores PDF attachment metadata as ['sizes' => [...], 'filesize' => n]
+     * with no top-level 'file' key, and wp_image_add_srcset_and_sizes() reads that
+     * key unguarded. Skipping those attachments changes nothing, because
+     * wp_calculate_image_srcset() bails on the same missing key a few frames down,
+     * but it avoids an `Undefined array key "file"` warning on every render.
+     *
+     * @param string $image
+     * @param array|false $imageMeta
+     * @param int $attachmentId
+     *
+     * @return string
+     */
+    private function addSrcsetAndSizes(string $image, $imageMeta, int $attachmentId): string
+    {
+        if (!is_array($imageMeta) || !isset($imageMeta['file'])) {
+            return $image;
+        }
+
+        return wp_image_add_srcset_and_sizes($image, $imageMeta, $attachmentId);
     }
 }
